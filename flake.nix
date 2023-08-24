@@ -25,10 +25,10 @@
 
       # A Nixpkgs overlay.
       overlays.default = final: prev: {
-        pepsy-discord-bot = with final;
+        pepsy-bot = with final;
           buildGoModule {
 
-            pname = "pepsy-discord-bot";
+            pname = "pepsy-bot";
             version = "v1.0";
             src = ./.;
             vendorSha256 = "sha256-t9unMXkACb+nypLC8asVRaSjXXaFNP51ULuBldDurEk=";
@@ -36,7 +36,7 @@
             meta = with lib; {
               description = "Discord bot for Pepsy's Gang";
               # description = "Discord bot for Pepsy";
-              homepage = "https://github.com/pinpox/pepsy-discord-bot";
+              homepage = "https://github.com/pinpox/pepsy-bot";
               license = licenses.gpl3;
               maintainers = with maintainers; [ pinpox ];
             };
@@ -45,17 +45,17 @@
 
       # Package
       packages = forAllSystems (system: {
-        inherit (nixpkgsFor.${system}) pepsy-discord-bot;
-        default = self.packages.${system}.pepsy-discord-bot;
+        inherit (nixpkgsFor.${system}) pepsy-bot;
+        default = self.packages.${system}.pepsy-bot;
       });
 
       # Nixos module
-      nixosModules.pepsy-discord-bot = { pkgs, lib, config, ... }:
+      nixosModules.pepsy-bot = { pkgs, lib, config, ... }:
         with lib;
-        let cfg = config.services.pepsy-discord-bot;
+        let cfg = config.services.pepsy-bot;
         in {
 
-          options.services.pepsy-discord-bot = {
+          options.services.pepsy-bot = {
             # Optios for configuration
             enable = mkEnableOption "Pepsy Bot";
             discordTokenFile = mkOption {
@@ -71,9 +71,8 @@
             nixpkgs.overlays = [ self.overlays.default ];
 
             # Service
-            systemd.services.pepsy-discord-bot = {
+            systemd.services.pepsy-bot = {
 
-              # environment.DISCORD_TOKEN = "$(cat %d/discord_token)";
 
               wantedBy = [ "multi-user.target" ];
               after = [ "network.target" ];
@@ -81,17 +80,17 @@
 
               script = ''
                 export DISCORD_TOKEN="$(cat ''${CREDENTIALS_DIRECTORY}/discord_token)"
-                ${pkgs.pepsy-discord-bot}/bin/pepsy-discord-bot
+                ${pkgs.pepsy-bot}/bin/pepsy-bot
               '';
 
               serviceConfig = {
                 LoadCredential = [ "discord_token:${cfg.discordTokenFile}" ];
 
-                WorkingDirectory = "${pkgs.pepsy-discord-bot}/bin";
-                # User = "pepsy-discord-bot";
-                # Group = "pepsy-discord-bot";
+                WorkingDirectory = "${pkgs.pepsy-bot}/bin";
+                # User = "pepsy-bot";
+                # Group = "pepsy-bot";
                 DynamicUser = true;
-                # ExecStart = "${pkgs.pepsy-discord-bot}/bin/pepsy-discord-bot";
+                # ExecStart = "${pkgs.pepsy-bot}/bin/pepsy-bot";
               };
             };
 
